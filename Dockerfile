@@ -1,5 +1,5 @@
 # First we compile the node stuff
-FROM node:19-alpine as node-build
+FROM node:22-alpine as node-build
 COPY ./frontend ./frontend
 WORKDIR frontend
 
@@ -18,14 +18,21 @@ COPY --from=node-build ./frontend/dist ./flaskr/vite
 RUN pip install --upgrade pip
 RUN pip install -r flaskr/requirements.txt
 
-# Install mongodb
-RUN apt update
-RUN apt upgrade -y
-RUN apt-get install gnupg curl
-RUN curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | gpg -o /usr/share/keyrings/mongodb-server-7.0.gpg --dearmor
-RUN echo "deb [ signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] http://repo.mongodb.org/apt/debian bookworm/mongodb-org/7.0 main" | tee /etc/apt/sources.list.d/mongodb-org-7.0.list
-RUN apt update
-RUN apt install -y mongodb-org
+# # Install mongodb
+RUN apt-get install -y gnupg curl
+RUN curl -fsSL https://pgp.mongodb.com/server-7.0.asc | gpg -o /usr/share/keyrings/mongodb-server-7.0.gpg --dearmor
+RUN echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-7.0.list
+RUN apt-get update
+RUN apt-get install -y mongodb-org
+
+
+# RUN apt update
+# RUN apt upgrade -y
+# RUN apt-get install gnupg curl
+# RUN curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | gpg -o /usr/share/keyrings/mongodb-server-7.0.gpg --dearmor
+# RUN echo "deb [ signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] http://repo.mongodb.org/apt/debian bookworm/mongodb-org/7.0 main" | tee /etc/apt/sources.list.d/mongodb-org-7.0.list
+# RUN apt update
+# RUN apt install -y mongodb-org
 
 # Set env variables
 ARG DB_PW=
